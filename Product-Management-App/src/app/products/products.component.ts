@@ -21,13 +21,23 @@ export class ProductsComponent implements OnInit{
   products : Array<any> = [];
 
   handleCheckProduct(product: any) {
-    product.checked = !product.checked;
+    this.http.patch<any>(`http://localhost:8089/products/${product.id}`,
+      {checked: !product.checked}).subscribe({
+      next: updatedProduct => {
+        product.checked = !product.checked;
+        //this.getProducts();
+        }
+      })
   }
 
   ngOnInit(): void {
+   this.getProducts();
+  }
+
+  private getProducts() {
     this.http.get<Array<any>>("http://localhost:8089/products").subscribe((data: any) => {
-      this.products = data;
-    },
+        this.products = data;
+      },
       (error: any) => {
         console.log(error);
       });
