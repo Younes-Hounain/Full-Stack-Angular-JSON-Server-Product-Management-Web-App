@@ -5,6 +5,7 @@ import {Product} from "../model/product.model";
 import {Observable} from "rxjs";
 import {FormsModule} from "@angular/forms";
 import {Router} from "@angular/router";
+import {AppStateService} from "../services/app-state.service";
 
 @Component({
   selector: 'app-products',
@@ -19,25 +20,25 @@ import {Router} from "@angular/router";
   styleUrl: './products.component.css'
 })
 export class ProductsComponent implements OnInit{
-  public products: Array<Product>=[];
-  public keyword: string = "";
-  totalPages:number = 0;
-  pageSize:number=3;
-  currentPage:number=1;
-  constructor(private productService:ProductService, private router:Router){
+
+  constructor(private productService:ProductService, private router:Router, public appState:AppStateService){
 
   }
   ngOnInit(): void {
     this.searchProducts();
   }
   searchProducts() {
-    this.productService.searchProducts(this.keyword,this.currentPage,this.pageSize)
+    this.productService.searchProducts(this.appState.productsState.keyword,
+      this.appState.productsState.currentPage,
+      this.appState.productsState.pageSize)
       .subscribe(resp => {
-          this.products = resp.body as Product[];
+
+          // @ts-ignore
+          this.appState.productsState.products = resp.body as Product[];
           let totalProducts:number = parseInt(resp.headers.get('x-total-count')!);
-          this.totalPages = Math.floor(totalProducts/this.pageSize);
-          if (totalProducts%this.pageSize!=0){
-            this.totalPages++;
+          this.appState.productsState.totalPages = Math.floor(totalProducts/this.appState.productsState.pageSize);
+          if (totalProducts%this.appState.productsState.pageSize!=0){
+            this.appState.productsState.totalPages++;
           }
         },
         error => {
@@ -59,7 +60,7 @@ export class ProductsComponent implements OnInit{
     if (confirm("Are you sure you want to delete this product?"))
     this.productService.deleteProduct(product).subscribe((data: any) => {
       //this.getProducts();
-      this.products = this.products.filter(p => p.id!= product.id)
+      this.appState.productsState.products = this.appState.productsState.products.filter((p:any) => p.id!= product.id)
     })  }
 
   // searchProducts() {
@@ -73,7 +74,7 @@ export class ProductsComponent implements OnInit{
   // }
 
   handleGoToPage(page: number) {
-    this.currentPage = page;
+    this.appState.productsState.currentPage = page;
     this.searchProducts();
 
   }
