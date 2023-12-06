@@ -28,4 +28,13 @@ export class ProductService {
   //searchProducts(keyword:string, page:number, size:number):Observable<Array<Product>> {
   //  return this.http.get<Array<Product>>(`http://localhost:8089/products?name_like=${keyword}&_page=${page}&_limit=${size}`);
   //}    we don't need this method anymore because we are using the getProducts method which contains everything we need.
+  getProductById(productId: number): Observable<Product> {
+    return this.http.get<Product>(`http://localhost:8089/products/${productId}`);
+
+  }
+
+  updateProduct(product: Product): Observable<Product> {
+    return this.http.put<Product>(`http://localhost:8089/products/${product.id}`, product);
+
+  }
 }

@@ -4,6 +4,7 @@ import {ProductService} from "../services/product.service";
 import {Product} from "../model/product.model";
 import {Observable} from "rxjs";
 import {FormsModule} from "@angular/forms";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-products',
@@ -23,7 +24,7 @@ export class ProductsComponent implements OnInit{
   totalPages:number = 0;
   pageSize:number=3;
   currentPage:number=1;
-  constructor(private productService:ProductService){
+  constructor(private productService:ProductService, private router:Router){
 
   }
   ngOnInit(): void {
@@ -75,5 +76,9 @@ export class ProductsComponent implements OnInit{
     this.currentPage = page;
     this.searchProducts();
 
+  }
+
+  handleEditProduct(product: Product) {
+    this.router.navigateByUrl(`/editProduct/${product.id}`);
   }
 }
