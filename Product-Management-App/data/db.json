@@ -23,6 +23,12 @@
       "name": "Smart Phone",
       "price": 950,
       "checked": true
+    },
+    {
+      "name": "Android",
+      "price": "6000",
+      "checked": "false",
+      "id": 5
     }
   ]
 }

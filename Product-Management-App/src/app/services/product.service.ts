@@ -10,8 +10,8 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
-  getProducts(page : number=1, size:number=4):Observable<Array<Product>> {
-    return this.http.get<Array<Product>>(`http://localhost:8089/products?_page=${page}&_limit=${size}`);
+  searchProducts(keyword:string='',page : number=1, size:number=4){
+    return this.http.get(`http://localhost:8089/products?name_like=${keyword}&_page=${page}&_limit=${size}`,{observe:'response'})
   }
   checkProduct(product:Product) {
     return this.http.patch<Product>(`http://localhost:8089/products/${product.id}`,
@@ -25,7 +25,7 @@ export class ProductService {
     return this.http.post<Product>(`http://localhost:8089/products`,
       product);
   }
-  searchProducts(keyword:string):Observable<Array<Product>> {
-    return this.http.get<Array<Product>>(`http://localhost:8089/products?name_like=${keyword}`);
-  }
+  //searchProducts(keyword:string, page:number, size:number):Observable<Array<Product>> {
+  //  return this.http.get<Array<Product>>(`http://localhost:8089/products?name_like=${keyword}&_page=${page}&_limit=${size}`);
+  //}    we don't need this method anymore because we are using the getProducts method which contains everything we need.
 }

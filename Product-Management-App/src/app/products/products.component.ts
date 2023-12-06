@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AsyncPipe, NgForOf} from "@angular/common";
+import {AsyncPipe, NgClass, NgForOf} from "@angular/common";
 import {ProductService} from "../services/product.service";
 import {Product} from "../model/product.model";
 import {Observable} from "rxjs";
@@ -11,7 +11,8 @@ import {FormsModule} from "@angular/forms";
   imports: [
     NgForOf,
     AsyncPipe,
-    FormsModule
+    FormsModule,
+    NgClass
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.css'
@@ -19,16 +20,24 @@ import {FormsModule} from "@angular/forms";
 export class ProductsComponent implements OnInit{
   public products: Array<Product>=[];
   public keyword: string = "";
+  totalPages:number = 0;
+  pageSize:number=3;
+  currentPage:number=1;
   constructor(private productService:ProductService){
 
   }
   ngOnInit(): void {
-    this.getProducts();
+    this.searchProducts();
   }
-  getProducts() {
-    this.productService.getProducts(1, 3)
-      .subscribe(data => {
-          this.products = data
+  searchProducts() {
+    this.productService.searchProducts(this.keyword,this.currentPage,this.pageSize)
+      .subscribe(resp => {
+          this.products = resp.body as Product[];
+          let totalProducts:number = parseInt(resp.headers.get('x-total-count')!);
+          this.totalPages = Math.floor(totalProducts/this.pageSize);
+          if (totalProducts%this.pageSize!=0){
+            this.totalPages++;
+          }
         },
         error => {
           console.log(error);
@@ -52,12 +61,19 @@ export class ProductsComponent implements OnInit{
       this.products = this.products.filter(p => p.id!= product.id)
     })  }
 
-  searchProducts() {
-    this.productService.searchProducts(this.keyword).subscribe({
-      next: value => {
-        this.products = value;
-      }
-    })
-  }
+  // searchProducts() {
+  //   this.currentPage = 1;
+  //   this.totalPages = 0;
+  //   this.productService.searchProducts(this.keyword, this.currentPage, this.pageSize).subscribe({
+  //     next: value => {
+  //       this.products = value;
+  //     }
+  //   })
+  // }
 
+  handleGoToPage(page: number) {
+    this.currentPage = page;
+    this.searchProducts();
+
+  }
 }
