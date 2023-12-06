@@ -27,6 +27,9 @@ export class ProductsComponent implements OnInit{
     this.searchProducts();
   }
   searchProducts() {
+    /*this.appState.setProductState({
+      status: "LOADING"
+    })*/
     this.productService.searchProducts(this.appState.productsState.keyword,
       this.appState.productsState.currentPage,
       this.appState.productsState.pageSize)
@@ -44,10 +47,14 @@ export class ProductsComponent implements OnInit{
             products : products,
             totalProducts : totalProducts,
             totalPages : totalPages,
+            status: "LOADED"
           })
         },
         error => {
-          console.log(error);
+          this.appState.setProductState({
+            status: "ERROR",
+            errorMessage: error
+          })
         });
   }
   //this.products$ = this.productsService.getProducts();
