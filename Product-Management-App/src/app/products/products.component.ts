@@ -3,19 +3,22 @@ import {AsyncPipe, NgForOf} from "@angular/common";
 import {ProductService} from "../services/product.service";
 import {Product} from "../model/product.model";
 import {Observable} from "rxjs";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-products',
   standalone: true,
   imports: [
     NgForOf,
-    AsyncPipe
+    AsyncPipe,
+    FormsModule
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.css'
 })
 export class ProductsComponent implements OnInit{
-  products: Array<Product>=[];
+  public products: Array<Product>=[];
+  public keyword: string = "";
   constructor(private productService:ProductService){
 
   }
@@ -23,7 +26,7 @@ export class ProductsComponent implements OnInit{
     this.getProducts();
   }
   getProducts() {
-    this.productService.getProducts()
+    this.productService.getProducts(1, 3)
       .subscribe(data => {
           this.products = data
         },
@@ -48,4 +51,13 @@ export class ProductsComponent implements OnInit{
       //this.getProducts();
       this.products = this.products.filter(p => p.id!= product.id)
     })  }
+
+  searchProducts() {
+    this.productService.searchProducts(this.keyword).subscribe({
+      next: value => {
+        this.products = value;
+      }
+    })
+  }
+
 }
