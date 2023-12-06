@@ -10,11 +10,14 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
-  public getProducts():Observable<Array<Product>> {
-    return this.http.get<Array<Product>>("http://localhost:8089/products")
+  getProducts():Observable<Array<Product>> {
+    return this.http.get<Array<Product>>("http://localhost:8089/products");
   }
-  public checkProducts(product:Product):Observable<any> {
+  checkProduct(product:Product) {
     return this.http.patch<Product>(`http://localhost:8089/products/${product.id}`,
-      {checked: !product.checked})
+      {checked:!product.checked})
+  }
+  deleteProduct(product:Product) {
+    return this.http.delete<any>(`http://localhost:8089/products/${product.id}`);
   }
 }

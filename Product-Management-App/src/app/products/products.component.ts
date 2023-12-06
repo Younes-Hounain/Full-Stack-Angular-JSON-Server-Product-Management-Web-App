@@ -1,45 +1,51 @@
 import {Component, OnInit} from '@angular/core';
-import {NgForOf} from "@angular/common";
-import {HttpClient} from "@angular/common/http";
+import {AsyncPipe, NgForOf} from "@angular/common";
 import {ProductService} from "../services/product.service";
 import {Product} from "../model/product.model";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-products',
   standalone: true,
   imports: [
-    NgForOf
+    NgForOf,
+    AsyncPipe
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.css'
 })
 export class ProductsComponent implements OnInit{
-  products: Array<Product> = [];
-  constructor(private productsService:ProductService){
+  products: Array<Product>=[];
+  constructor(private productService:ProductService){
 
   }
+  ngOnInit(): void {
+    this.getProducts();
+  }
+  getProducts() {
+    this.productService.getProducts()
+      .subscribe(data => {
+          this.products = data
+        },
+        error => {
+          console.log(error);
+        });
+  }
+  //this.products$ = this.productsService.getProducts();
 
   handleCheckProduct(product: Product) {
-    this.productsService.checkProducts(product)
+    this.productService.checkProduct(product)
       .subscribe({
       next: updatedProduct => {
-        product.checked = !product.checked;
+        product.checked =! product.checked;
         //this.getProducts();
         }
       })
   }
-
-  ngOnInit(): void {
-   this.getProducts();
-  }
-
-  private getProducts() {
-    this.productsService.getProducts()
-      .subscribe((data: any) => {
-        this.products = data;
-      },
-      (error: any) => {
-        console.log(error);
-      });
-  }
+  handleDeleteProduct(product: Product) {
+    if (confirm("Are you sure you want to delete this product?"))
+    this.productService.deleteProduct(product).subscribe((data: any) => {
+      //this.getProducts();
+      this.products = this.products.filter(p => p.id!= product.id)
+    })  }
 }
