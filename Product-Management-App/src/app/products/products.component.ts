@@ -33,13 +33,18 @@ export class ProductsComponent implements OnInit{
       .subscribe(resp => {
 
           // @ts-ignore
-          this.appState.productsState.products = resp.body as Product[];
+          let products = resp.body as Product[];
           let totalProducts:number = parseInt(resp.headers.get('x-total-count')!);
-          this.appState.productsState.totalProducts = totalProducts;
-          this.appState.productsState.totalPages = Math.floor(totalProducts/this.appState.productsState.pageSize);
+          //this.appState.productsState.totalProducts = totalProducts;
+          let totalPages = Math.floor(totalProducts/this.appState.productsState.pageSize);
           if (totalProducts%this.appState.productsState.pageSize!=0){
-            this.appState.productsState.totalPages++;
+            ++totalPages;
           }
+          this.appState.setProductState({
+            products : products,
+            totalProducts : totalProducts,
+            totalPages : totalPages,
+          })
         },
         error => {
           console.log(error);
